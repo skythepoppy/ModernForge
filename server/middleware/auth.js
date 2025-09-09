@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-export const authMiddleware = (req, res, next) => {
+function authMiddleware(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1]; // Bearer TOKEN
 
@@ -15,7 +15,7 @@ export const authMiddleware = (req, res, next) => {
   }
 };
 
-export const adminMiddleware = (req, res, next) => {
+function adminMiddleware(req, res, next) {
   if (req.user.role !== 'admin') return res.status(403).json({ message: "Admins only" });
   next();
 };
