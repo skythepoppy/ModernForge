@@ -14,6 +14,15 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ message: "Name, email, and password are required" });
     }
 
+    // --- PASSWORD VALIDATION ---
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{10,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        message:
+          "Password must be at least 10 characters long and include at least one uppercase letter, one number, and one special character."
+      });
+    }
+
     // Default role = 'user'
     let assignedRole = "user";
 

@@ -14,6 +14,7 @@ const port = process.env.PORT || 5050;
 app.use(cors());
 app.use(express.json());
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 
 // --- MySQL setup ---
@@ -47,9 +48,6 @@ const getSignedUrl = (key) => {
     };
     return s3.getSignedUrl('getObject', params);
 };
-
-// --- attach user routes under /api/users ---
-app.use('/api/users', userRoutes);
 
 // --- API route to fetch toys ---
 app.get('/api/toys', (req, res) => {
