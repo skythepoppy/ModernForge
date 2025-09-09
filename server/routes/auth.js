@@ -14,7 +14,7 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ message: "Name, email, and password are required" });
     }
 
-    // --- PASSWORD VALIDATION ---
+    // --- password validation ---
     const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{10,}$/;
     if (!passwordRegex.test(password)) {
       return res.status(400).json({
