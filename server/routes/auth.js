@@ -7,31 +7,43 @@ const router = express.Router();
 
 // REGISTER
 router.post("/register", async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, role, adminKey } = req.body;
 
   try {
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Name, email, and password are required" });
     }
 
-    // check if user exists
-    const userCheck = await db("users").where({ email }).select();
-    if (userCheck.length > 0) {
+    // Default role = 'user'
+    let assignedRole = "user";
+
+    // Assign admin role only if valid ADMIN_KEY provided
+    if (role === "admin") {
+      if (!adminKey || adminKey !== process.env.ADMIN_KEY) {
+        return res.status(403).json({ message: "Cannot assign admin role without valid key" });
+      }
+      assignedRole = "admin";
+    }
+
+    // Check if user exists
+    const existingUsers = await db("users").where({ email }).select();
+    if (existingUsers.length > 0) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // hash password
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // insert user
-    const [insertId] = await db("users").insert({ name, email, password: hashedPassword });
+    // Insert user
+    const [insertId] = await db("users").insert({ name, email, password: hashedPassword, role: assignedRole });
 
-    // fetch newly created user
-    const newUserRows = await db("users")
+    // Fetch newly created user
+    const newUser = await db("users")
       .where({ id: insertId })
-      .select("id", "name", "email", "role");
+      .select("id", "name", "email", "role")
+      .first();
 
-    res.status(200).json(newUserRows[0]);
+    res.status(201).json(newUser);
   } catch (err) {
     console.error("Register error:", err);
     res.status(500).json({ error: err.message });
@@ -47,17 +59,15 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Email and password are required" });
     }
 
-    // fetch user
-    const userRows = await db("users").where({ email }).select();
-    if (userRows.length === 0) return res.status(400).json({ message: "Invalid credentials" });
+    // Fetch user
+    const user = await db("users").where({ email }).select().first();
+    if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
-    const user = userRows[0];
-
-    // check password
+    // Check password
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) return res.status(400).json({ message: "Invalid credentials" });
 
-    // generate JWT
+    // Generate JWT
     const token = jwt.sign(
       { id: user.id, role: user.role },
       process.env.JWT_SECRET,
