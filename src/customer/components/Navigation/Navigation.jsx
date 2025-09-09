@@ -17,7 +17,7 @@ import { Link } from "react-router-dom";
 import { Gi3dHammer } from "react-icons/gi";
 import { FaSearch } from "react-icons/fa";
 import AlertCarousel from "./AlertCarousel";
-
+import { useEffect, useState } from "react";
 
 
 const navigation = [
@@ -47,6 +47,14 @@ function classNames(...classes) {
 }
 
 export default function Navigation() {
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token) // if token exists, then true
+  }, []);
+
   const alerts = [
     "Free shipping for orders over $100!",
     "New DIY kits just released!",
@@ -144,16 +152,20 @@ export default function Navigation() {
             </div>
 
             {/* Profile */}
-
             <Menu as="div" className="relative ml-3">
-              <Link to="/register">
-                <MenuButton className="relative flex flex-col items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500">
-                  <span className="absolute -inset-1.5" />
-                  <span className="sr-only">Open user menu</span>
-
-                  <UserIcon aria-hidden="true" className="text-gray-300 w-8 h-8" />
-                </MenuButton>
-              </Link>
+              {isLoggedIn ? (
+                <Link to="/profile">
+                  <MenuButton className="relative flex flex-col items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500">
+                    <UserIcon className="text-orange-500 w-8 h-8" aria-hidden="true" />
+                  </MenuButton>
+                </Link>
+              ) : (
+                <Link to="/register">
+                  <MenuButton className="relative flex flex-col items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500">
+                    <UserIcon className="text-gray-300 w-8 h-8" aria-hidden="true" />
+                  </MenuButton>
+                </Link>
+              )}
             </Menu>
 
 
