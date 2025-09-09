@@ -5,6 +5,8 @@ const cors = require('cors');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
+const userRoutes = require('./routes/user.js'); 
+
 const app = express();
 const port = process.env.PORT || 5050;
 
@@ -31,6 +33,9 @@ const s3 = new AWS.S3({
     region: process.env.AWS_REGION,
 });
 
+// make connection available to routes
+app.set('db', connection);
+
 // --- Helper to generate signed URLs ---
 const getSignedUrl = (key) => {
     const params = {
@@ -40,6 +45,9 @@ const getSignedUrl = (key) => {
     };
     return s3.getSignedUrl('getObject', params);
 };
+
+// --- attach user routes under /api/users ---
+app.use('/api/users', userRoutes);
 
 // --- API route to fetch toys ---
 app.get('/api/toys', (req, res) => {
