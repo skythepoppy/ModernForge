@@ -52,12 +52,37 @@ router.post("/register", async (req, res) => {
       .select("id", "name", "email", "role")
       .first();
 
+    // --- Nodemailer: send welcome email ---
+    const nodemailer = require("nodemailer");
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT),
+      secure: process.env.SMTP_SECURE === "true",
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+
+    try {
+      await transporter.sendMail({
+        from: `"ModernForge Team" <${process.env.SMTP_USER}>`,
+        to: email,
+        subject: "Welcome to ModernForge!",
+        text: `Hi ${name},\n\nThank you for registering at ModernForge!\n\n- The ModernForge Team`,
+      });
+    } catch (emailErr) {
+      console.error("Error sending welcome email:", emailErr);
+      // Don't fail registration if email fails
+    }
+
     res.status(201).json(newUser);
   } catch (err) {
     console.error("Register error:", err);
     res.status(500).json({ error: err.message });
   }
 });
+
 
 // LOGIN
 router.post("/login", async (req, res) => {
