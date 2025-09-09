@@ -143,18 +143,19 @@ export default function Navigation() {
               </form>
             </div>
 
-            {/* Profile dropdown */}
-            <Menu as="div" className="relative ml-3">
-              <MenuButton className="relative flex flex-col items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500">
-                <span className="absolute -inset-1.5" />
-                <span className="sr-only">Open user menu</span>
+            {/* Profile */}
 
-                <UserIcon aria-hidden="true" className="text-gray-300 w-8 h-8" />
-                <span className="text-gray-300 text-xs font-medium mt-1">
-                  Sign In
-                </span>
-              </MenuButton>
+            <Menu as="div" className="relative ml-3">
+              <Link to="/register">
+                <MenuButton className="relative flex flex-col items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500">
+                  <span className="absolute -inset-1.5" />
+                  <span className="sr-only">Open user menu</span>
+
+                  <UserIcon aria-hidden="true" className="text-gray-300 w-8 h-8" />
+                </MenuButton>
+              </Link>
             </Menu>
+
 
             <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
               <button
@@ -190,8 +191,8 @@ export default function Navigation() {
                             <Link
                               to={cat.href}
                               className={`block px-3 py-2 rounded-md text-base ${active
-                                  ? "text-orange-500"
-                                  : "text-gray-300 hover:text-white"
+                                ? "text-orange-500"
+                                : "text-gray-300 hover:text-white"
                                 }`}
                             >
                               {cat.name}
@@ -235,8 +236,8 @@ export default function Navigation() {
                             <Link
                               to={cat.href}
                               className={`px-2 py-1 rounded-md ${active
-                                  ? "text-orange-500"
-                                  : "text-gray-300 hover:text-white"
+                                ? "text-orange-500"
+                                : "text-gray-300 hover:text-white"
                                 }`}
                             >
                               {cat.name}

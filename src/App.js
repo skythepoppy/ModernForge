@@ -14,6 +14,8 @@ import WatercraftPage from './customer/components/Navigation/Pages/ToyPage/Water
 import ProgrammablePage from './customer/components/Navigation/Pages/ToyPage/ProgrammablePage';
 import ProductPage from './customer/ProductPage/ProductPage';
 import NewsletterPage from './customer/components/Navigation/Pages/NewsLetterPage/NewsletterPage';
+import LoginPage from './customer/components/Navigation/Pages/AuthPage/Login';
+import RegisterPage from './customer/components/Navigation/Pages/AuthPage/Registration';
 
 
 
@@ -36,6 +38,8 @@ function App() {
           <Route path='/programmables' element={<ProgrammablePage />} />
           <Route path='/products/:productId' element={<ProductPage />} />
           <Route path='/newsletter' element={<NewsletterPage />} />
+          <Route path='/register' element={<RegisterPage />} />
+          <Route path='/login' element={<LoginPage />} />
         </Routes>
       </Layout>
     </Router>
