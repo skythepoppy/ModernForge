@@ -1,9 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { verifyToken } = require("../middleware/auth.js"); // middleware 
+const { authMiddleware, adminMiddleware } = require("../middleware/auth.js"); // middleware
+const db = require("../db.js"); //sql connect
+
 
 // Get logged-in user's profile
-router.get("/profile", verifyToken, (req, res) => {
+router.get("/profile", authMiddleware, (req, res) => {
     // req.user is set by verifyToken (decoded JWT)
     res.json({
         message: "User profile fetched successfully",
@@ -12,13 +14,12 @@ router.get("/profile", verifyToken, (req, res) => {
 });
 
 // Admin route to fetch all users
-router.get("/all", verifyToken, async (req, res) => {
+router.get("/all", authMiddleware, adminMiddleware, async (req, res) => {
     if (req.user.role !== "admin") {
         return res.status(403).json({ message: "Forbidden: Admins only" });
     }
 
     try {
-        const db = req.app.get('db'); // get MySQL connection
         const [users] = await db.promise().query("SELECT id, name, email, role FROM users");
         res.json({
             message: "All users fetched successfully",
