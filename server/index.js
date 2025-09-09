@@ -5,6 +5,7 @@ const cors = require('cors');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
+const authRoutes = require('./routes/auth.js');
 const userRoutes = require('./routes/user.js'); 
 
 const app = express();
@@ -12,6 +13,8 @@ const port = process.env.PORT || 5050;
 
 app.use(cors());
 app.use(express.json());
+app.use('/api/auth', authRoutes);
+
 
 // --- MySQL setup ---
 const connection = mysql.createConnection({
