@@ -11,7 +11,7 @@ router.post("/register", async (req, res) => {
 
   try {
     // check if user exists
-    const userCheck = await db.query("SELECT * FROM users WHERE email = $1", [email]);
+    const userCheck = await db.query("SELECT * FROM users WHERE email = ?", [email]);
     if (userCheck.rows.length > 0) {
       return res.status(400).json({ message: "User already exists" });
     }
@@ -21,7 +21,7 @@ router.post("/register", async (req, res) => {
 
     // insert user
     const newUser = await db.query(
-      "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id, name, email, role",
+      "INSERT INTO users (name, email, password) VALUES (?, ?, ?) RETURNING id, name, email, role",
       [name, email, hashedPassword]
     );
 
@@ -36,7 +36,7 @@ router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await db.query("SELECT * FROM users WHERE email = $1", [email]);
+    const user = await db.query("SELECT * FROM users WHERE email = ?", [email]);
     if (user.rows.length === 0) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
