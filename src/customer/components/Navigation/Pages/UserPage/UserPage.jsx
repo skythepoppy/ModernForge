@@ -1,13 +1,15 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
+import { getAuthHeader } from "../middleware/auth";
+import axios from "axios";
 
 export default function UserPage() {
     const { user, token, logout } = useContext(AuthContext);
     const [message, setMessage] = useState("");
+    const [userData, setUserData] = useState(null); // example API data
     const navigate = useNavigate();
 
-    // Redirect if not authenticated or wrong role
     if (!user || !token) {
         navigate("/login", { replace: true });
         return null;
@@ -18,8 +20,25 @@ export default function UserPage() {
         return null;
     }
 
+    useEffect(() => {
+        // Example: fetch user-specific data from backend
+        const fetchData = async () => {
+            try {
+                const res = await axios.get(
+                    "http://localhost:5050/api/user/data",
+                    getAuthHeader(token)
+                );
+                setUserData(res.data);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        fetchData();
+    }, [token]);
+
     const handleLogout = () => {
-        logout(); // centralized logout
+        logout();
         setMessage("Successfully logged out!");
 
         setTimeout(() => {
@@ -33,10 +52,9 @@ export default function UserPage() {
             <p>Email: {user.email}</p>
             <p>Role: {user.role}</p>
 
-            {/* Render logout message */}
-            {message && (
-                <p className="mt-4 text-green-500 font-medium">{message}</p>
-            )}
+            {userData && <pre>{JSON.stringify(userData, null, 2)}</pre>}
+
+            {message && <p className="mt-4 text-green-500 font-medium">{message}</p>}
 
             <button
                 onClick={handleLogout}
