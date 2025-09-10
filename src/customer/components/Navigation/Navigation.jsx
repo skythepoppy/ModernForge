@@ -12,12 +12,14 @@ import {
   ShoppingCartIcon,
   XMarkIcon,
   UserIcon,
+  UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 import { Gi3dHammer } from "react-icons/gi";
 import { FaSearch } from "react-icons/fa";
 import AlertCarousel from "./AlertCarousel";
-import { useEffect, useState } from "react";
+import { useContext } from "react";
+import AuthContext from "../context/AuthContext";
 
 
 const navigation = [
@@ -48,12 +50,7 @@ function classNames(...classes) {
 
 export default function Navigation() {
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token) // if token exists, then true
-  }, []);
+  const { user } = useContext(AuthContext);
 
   const alerts = [
     "Free shipping for orders over $100!",
@@ -153,20 +150,29 @@ export default function Navigation() {
 
             {/* Profile */}
             <Menu as="div" className="relative ml-3">
-              {isLoggedIn ? (
-                <Link to="/profile">
-                  <MenuButton className="relative flex flex-col items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500">
-                    <UserIcon className={isLoggedIn ? "text-orange-500 w-8 h-8" : "text-gray-300 w-8 h-8"} aria-hidden="true" />
-                  </MenuButton>
-                </Link>
-              ) : (
-                <Link to="/register">
-                  <MenuButton className="relative flex flex-col items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500">
+              <Link
+                to={
+                  user
+                    ? user.role === "admin"
+                      ? "/admin/dashboard"
+                      : "/user/dashboard"
+                    : "/register"
+                }
+              >
+                <MenuButton className="relative flex flex-col items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500">
+                  {user ? (
+                    user.role === "admin" ? (
+                      <UserGroupIcon className="text-orange-500 w-8 h-8" aria-hidden="true" />
+                    ) : (
+                      <UserIcon className="text-orange-500 w-8 h-8" aria-hidden="true" />
+                    )
+                  ) : (
                     <UserIcon className="text-gray-300 w-8 h-8" aria-hidden="true" />
-                  </MenuButton>
-                </Link>
-              )}
+                  )}
+                </MenuButton>
+              </Link>
             </Menu>
+
 
 
             <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">

@@ -16,15 +16,16 @@ import ProductPage from './customer/ProductPage/ProductPage';
 import NewsletterPage from './customer/components/Navigation/Pages/NewsLetterPage/NewsletterPage';
 import LoginPage from './customer/components/Navigation/Pages/AuthPage/Login';
 import RegisterPage from './customer/components/Navigation/Pages/AuthPage/Registration';
-
-
-
+import AdminPage from './customer/components/Navigation/Pages/AdminPage/AdminPage';
+import UserPage from './customer/components/Navigation/Pages/UserPage/UserPage';
+import ProtectedRoute from './customer/components/ProtectedRoute'; // import ProtectedRoute
 
 function App() {
   return (
     <Router>
       <Layout>
         <Routes>
+          {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/faq" element={<FAQPage />} />
           <Route path="/support" element={<SupportPage />} />
@@ -40,6 +41,24 @@ function App() {
           <Route path='/newsletter' element={<NewsletterPage />} />
           <Route path='/register' element={<RegisterPage />} />
           <Route path='/login' element={<LoginPage />} />
+
+          {/* Protected Routes */}
+          <Route 
+            path='/user/dashboard' 
+            element={
+              <ProtectedRoute role="user">
+                <UserPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path='/admin/dashboard' 
+            element={
+              <ProtectedRoute role="admin">
+                <AdminPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Layout>
     </Router>

@@ -52,6 +52,13 @@ router.post("/register", async (req, res) => {
       .select("id", "name", "email", "role")
       .first();
 
+    // Generate JWT token for new user
+    const token = jwt.sign(
+      { id: newUser.id, role: newUser.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "30m" }
+    );
+
     // --- Nodemailer: send welcome email ---
     const nodemailer = require("nodemailer");
     const transporter = nodemailer.createTransport({
@@ -76,7 +83,7 @@ router.post("/register", async (req, res) => {
       // Don't fail registration if email fails
     }
 
-    res.status(201).json(newUser);
+    res.status(201).json({ user: newUser, token: token });
   } catch (err) {
     console.error("Register error:", err);
     res.status(500).json({ error: err.message });

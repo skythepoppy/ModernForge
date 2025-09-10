@@ -1,40 +1,54 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect, useContext } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import AuthContext from "../../../context/AuthContext";
+import api from "../../../api/api";
 
 const LoginPage = () => {
-    const [formData, setFormData] = useState({
-        email: "",
-        password: "",
-    });
+    const [formData, setFormData] = useState({ email: "", password: "" });
     const [message, setMessage] = useState("");
 
+    const { user, token, login } = useContext(AuthContext);
+    const navigate = useNavigate();
+    const location = useLocation(); // track previous route
+
+    // If already logged in, redirect to dashboard or previous route
+    useEffect(() => {
+        if (user && token) handleRedirect(user);
+    }, [user, token]);
+
     const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
+        setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post("http://localhost:5050/api/auth/login", formData);
-
-            // Store JWT (sessionStorage for now)
-            sessionStorage.setItem("token", res.data.token);
+            const res = await api.post("/auth/login", formData); // centralized Axios
+            login(res.data.user, res.data.token); // update AuthContext + Axios
 
             setMessage("Login successful!");
             console.log("Logged in user:", res.data);
 
-            // TODO: Add role-based redirection
+            handleRedirect(res.data.user);
         } catch (err) {
             setMessage(err.response?.data?.message || "Error occurred");
         }
     };
 
+    // 🔑 Helper: redirect user after login
+    const handleRedirect = (user) => {
+        const from = location.state?.from?.pathname; // comes from ProtectedRoute
+        if (from && from !== "/login" && from !== "/register") {
+            navigate(from, { replace: true });
+        } else if (user.role === "admin") {
+            navigate("/admin/dashboard", { replace: true });
+        } else {
+            navigate("/user/dashboard", { replace: true });
+        }
+    };
+
     return (
-        <div className="flex items-center justify-center h-screen bg-gray-100">
+        <div className="flex justify-center items-start pt-8 pb-6">
             <form
                 onSubmit={handleSubmit}
                 className="bg-white p-8 rounded-lg shadow-lg w-96"
@@ -60,7 +74,7 @@ const LoginPage = () => {
 
                 <button
                     type="submit"
-                    className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+                    className="w-full bg-orange-500 text-white p-2 rounded hover:bg-orange-600"
                 >
                     Login
                 </button>
