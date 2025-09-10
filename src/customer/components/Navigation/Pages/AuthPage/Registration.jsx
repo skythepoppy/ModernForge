@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import AuthContext from "../context/AuthContext";
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
@@ -9,6 +10,9 @@ const RegisterPage = () => {
         password: "",
     });
     const [message, setMessage] = useState("");
+
+    const { login } = useContext(AuthContext);
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         setFormData({
@@ -21,8 +25,19 @@ const RegisterPage = () => {
         e.preventDefault();
         try {
             const res = await axios.post("http://localhost:5050/api/auth/register", formData);
+
+            // auto-login using AuthContext
+            login(res.data.user, res.data.token);
+
             setMessage("Registration successful!");
             console.log("Registered user:", res.data);
+
+            // Redirect based on role
+            if (res.data.user.role === "admin") {
+                navigate("/admin/dashboard", { replace: true });
+            } else {
+                navigate("/user/dashboard", { replace: true });
+            }
         } catch (err) {
             setMessage(err.response?.data?.message || "Error occurred");
         }
