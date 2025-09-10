@@ -49,11 +49,20 @@ function classNames(...classes) {
 export default function Navigation() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token) // if token exists, then true
+    const token = sessionStorage.getItem("token");
+    const storedUser = sessionStorage.getItem("user");
+    if (token && storedUser) {
+      setIsLoggedIn(true);
+      setUser(JSON.parse(storedUser));
+    } else {
+      setIsLoggedIn(false);
+      setUser(null);
+    }
   }, []);
+
 
   const alerts = [
     "Free shipping for orders over $100!",
@@ -153,10 +162,13 @@ export default function Navigation() {
 
             {/* Profile */}
             <Menu as="div" className="relative ml-3">
-              {isLoggedIn ? (
-                <Link to="/profile">
+              {isLoggedIn && user ? (
+                <Link to={user.role === "admin" ? "/admin/dashboard" : "/user/dashboard"}>
                   <MenuButton className="relative flex flex-col items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500">
-                    <UserIcon className={isLoggedIn ? "text-orange-500 w-8 h-8" : "text-gray-300 w-8 h-8"} aria-hidden="true" />
+                    <UserIcon
+                      className="text-orange-500 w-8 h-8"
+                      aria-hidden="true"
+                    />
                   </MenuButton>
                 </Link>
               ) : (
@@ -167,6 +179,7 @@ export default function Navigation() {
                 </Link>
               )}
             </Menu>
+
 
 
             <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">

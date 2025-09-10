@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -9,6 +9,22 @@ const LoginPage = () => {
     });
     const [message, setMessage] = useState("");
 
+    const navigate = useNavigate();
+
+    // --- Auth check: redirect if already logged in ---
+    useEffect(() => {
+        const token = sessionStorage.getItem("token");
+        const storedUser = sessionStorage.getItem("user");
+        if (token && storedUser) {
+            const user = JSON.parse(storedUser);
+            if (user.role === "admin") {
+                navigate("/admin/dashboard", { replace: true });
+            } else {
+                navigate("/user/dashboard", { replace: true });
+            }
+        }
+    }, [navigate]);
+
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -16,27 +32,24 @@ const LoginPage = () => {
         });
     };
 
-    const navigate = useNavigate();
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const res = await axios.post("http://localhost:5050/api/auth/login", formData);
 
-            // Store JWT (sessionStorage for now)
+            // Store JWT and user info
             sessionStorage.setItem("token", res.data.token);
             sessionStorage.setItem("user", JSON.stringify(res.data.user));
 
             setMessage("Login successful!");
             console.log("Logged in user:", res.data);
 
-            // role redirection
-            if (res.data.user.role == "admin"){
-                navigate("/admin/dashboard");
-            }else{
-                navigate("/user/dashboard");
+            // Role-based redirection
+            if (res.data.user.role === "admin") {
+                navigate("/admin/dashboard", { replace: true });
+            } else {
+                navigate("/user/dashboard", { replace: true });
             }
-            
         } catch (err) {
             setMessage(err.response?.data?.message || "Error occurred");
         }
