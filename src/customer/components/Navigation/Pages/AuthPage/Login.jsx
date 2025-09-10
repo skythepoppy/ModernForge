@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({
@@ -16,6 +16,8 @@ const LoginPage = () => {
         });
     };
 
+    const navigate = useNavigate();
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -23,11 +25,18 @@ const LoginPage = () => {
 
             // Store JWT (sessionStorage for now)
             sessionStorage.setItem("token", res.data.token);
+            sessionStorage.setItem("user", JSON.stringify(res.data.user));
 
             setMessage("Login successful!");
             console.log("Logged in user:", res.data);
 
-            // TODO: Add role-based redirection
+            // role redirection
+            if (res.data.user.role == "admin"){
+                navigate("/admin/dashboard");
+            }else{
+                navigate("/user/dashboard");
+            }
+            
         } catch (err) {
             setMessage(err.response?.data?.message || "Error occurred");
         }

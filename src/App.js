@@ -16,8 +16,8 @@ import ProductPage from './customer/ProductPage/ProductPage';
 import NewsletterPage from './customer/components/Navigation/Pages/NewsLetterPage/NewsletterPage';
 import LoginPage from './customer/components/Navigation/Pages/AuthPage/Login';
 import RegisterPage from './customer/components/Navigation/Pages/AuthPage/Registration';
-
-
+import AdminPage from './customer/components/Navigation/Pages/AdminPage/AdminPage';
+import UserPage from './customer/components/Navigation/Pages/UserPage/UserPage';
 
 
 function App() {
@@ -40,6 +40,8 @@ function App() {
           <Route path='/newsletter' element={<NewsletterPage />} />
           <Route path='/register' element={<RegisterPage />} />
           <Route path='/login' element={<LoginPage />} />
+          <Route path='/user/dashboard' element={<UserPage />} />
+          <Route path='/admin/dashboard' element={<AdminPage />}/>
         </Routes>
       </Layout>
     </Router>
