@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import AuthContext from "../context/AuthContext";
-import api from "../api/api"; // centralized Axios instance
+import AuthContext from "../../../context/AuthContext";
+import api from "../../../api/api";
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({

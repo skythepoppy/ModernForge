@@ -1,41 +1,31 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AuthContext from "../context/AuthContext";
-import { getAuthHeader } from "../middleware/auth";
-import axios from "axios";
+import AuthContext from "../../../context/AuthContext";
+import api from "../../../api/api";
 
 export default function UserPage() {
-    const { user, token, logout } = useContext(AuthContext);
+    const { user, logout } = useContext(AuthContext);
     const [message, setMessage] = useState("");
     const [userData, setUserData] = useState(null); // example API data
     const navigate = useNavigate();
 
-    if (!user || !token) {
-        navigate("/login", { replace: true });
-        return null;
-    }
-
-    if (user.role !== "user") {
-        navigate("/login", { replace: true });
-        return null;
-    }
-
+    // Fetch user-specific data from backend
     useEffect(() => {
-        // Example: fetch user-specific data from backend
         const fetchData = async () => {
             try {
-                const res = await axios.get(
-                    "http://localhost:5050/api/user/data",
-                    getAuthHeader(token)
-                );
+                const res = await api.get("/user/data"); // centralized Axios handles token
                 setUserData(res.data);
             } catch (err) {
-                console.error(err);
+                console.error("Error fetching user data:", err);
+                if (err.response?.status === 401 || err.response?.status === 403) {
+                    logout();
+                    navigate("/login", { replace: true });
+                }
             }
         };
 
         fetchData();
-    }, [token]);
+    }, [logout, navigate]);
 
     const handleLogout = () => {
         logout();
@@ -46,13 +36,20 @@ export default function UserPage() {
         }, 1500);
     };
 
+    if (!user) return null; // Auth loading or not logged in
+
     return (
         <div className="p-8">
             <h1 className="text-3xl font-bold mb-4">Welcome, {user.name}!</h1>
             <p>Email: {user.email}</p>
             <p>Role: {user.role}</p>
 
-            {userData && <pre>{JSON.stringify(userData, null, 2)}</pre>}
+            {userData && (
+                <div className="mt-4">
+                    {/* Render any user-specific data here */}
+                    <pre>{JSON.stringify(userData, null, 2)}</pre>
+                </div>
+            )}
 
             {message && <p className="mt-4 text-green-500 font-medium">{message}</p>}
 

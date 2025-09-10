@@ -1,41 +1,31 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AuthContext from "../context/AuthContext";
-import { getAuthHeader } from "../middleware/auth";
-import axios from "axios";
+import AuthContext from "../../../context/AuthContext";
+import api from "../../../api/api";
 
 export default function AdminPage() {
-  const { user, token, logout } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
   const [message, setMessage] = useState("");
   const [adminData, setAdminData] = useState(null); // example API data
   const navigate = useNavigate();
 
-  if (!user || !token) {
-    navigate("/login", { replace: true });
-    return null;
-  }
-
-  if (user.role !== "admin") {
-    navigate("/login", { replace: true });
-    return null;
-  }
-
+  // Fetch admin-specific data from backend
   useEffect(() => {
-    // Example: fetch admin-specific data from backend
     const fetchAdminData = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5050/api/admin/data",
-          getAuthHeader(token)
-        );
+        const res = await api.get("/admin/data"); // centralized Axios handles token
         setAdminData(res.data);
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching admin data:", err);
+        if (err.response?.status === 401 || err.response?.status === 403) {
+          logout();
+          navigate("/login", { replace: true });
+        }
       }
     };
 
     fetchAdminData();
-  }, [token]);
+  }, [logout, navigate]);
 
   const handleLogout = () => {
     logout();
@@ -46,12 +36,19 @@ export default function AdminPage() {
     }, 1500);
   };
 
+  if (!user) return null; // Auth loading or not logged in
+
   return (
     <div className="p-8">
       <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
       <p>Welcome, {user.name}!</p>
 
-      {adminData && <pre>{JSON.stringify(adminData, null, 2)}</pre>}
+      {adminData && (
+        <div className="mt-4">
+          {/* Render any admin-specific data here */}
+          <pre>{JSON.stringify(adminData, null, 2)}</pre>
+        </div>
+      )}
 
       <div className="mt-6 space-y-4">
         <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
