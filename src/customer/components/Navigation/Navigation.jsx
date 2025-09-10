@@ -17,7 +17,8 @@ import { Link } from "react-router-dom";
 import { Gi3dHammer } from "react-icons/gi";
 import { FaSearch } from "react-icons/fa";
 import AlertCarousel from "./AlertCarousel";
-import { useEffect, useState } from "react";
+import { useContext } from "react";
+import AuthContext from "../context/AuthContext";
 
 
 const navigation = [
@@ -48,36 +49,7 @@ function classNames(...classes) {
 
 export default function Navigation() {
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
-
-  // Function to check login state
-  const checkLogin = () => {
-    const token = sessionStorage.getItem("token");
-    const storedUser = sessionStorage.getItem("user");
-    if (token && storedUser) {
-      setIsLoggedIn(true);
-      setUser(JSON.parse(storedUser));
-    } else {
-      setIsLoggedIn(false);
-      setUser(null);
-    }
-  };
-
-  // Check on mount
-  useEffect(() => {
-    checkLogin();
-
-    // Listen to storage changes (other tabs or logout events)
-    const handleStorageChange = () => {
-      checkLogin();
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
-
+  const { user } = useContext(AuthContext);
 
   const alerts = [
     "Free shipping for orders over $100!",
@@ -177,22 +149,22 @@ export default function Navigation() {
 
             {/* Profile */}
             <Menu as="div" className="relative ml-3">
-              {isLoggedIn && user ? (
-                <Link to={user.role === "admin" ? "/admin/dashboard" : "/user/dashboard"}>
-                  <MenuButton className="relative flex flex-col items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500">
-                    <UserIcon
-                      className="text-orange-500 w-8 h-8"
-                      aria-hidden="true"
-                    />
-                  </MenuButton>
-                </Link>
-              ) : (
-                <Link to="/register">
-                  <MenuButton className="relative flex flex-col items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500">
-                    <UserIcon className="text-gray-300 w-8 h-8" aria-hidden="true" />
-                  </MenuButton>
-                </Link>
-              )}
+              <Link
+                to={
+                  user
+                    ? user.role === "admin"
+                      ? "/admin/dashboard"
+                      : "/user/dashboard"
+                    : "/register"
+                }
+              >
+                <MenuButton className="relative flex flex-col items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500">
+                  <UserIcon
+                    className={user ? "text-orange-500 w-8 h-8" : "text-gray-300 w-8 h-8"}
+                    aria-hidden="true"
+                  />
+                </MenuButton>
+              </Link>
             </Menu>
 
 
