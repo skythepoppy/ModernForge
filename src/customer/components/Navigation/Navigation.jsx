@@ -51,7 +51,8 @@ export default function Navigation() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
+  // Function to check login state
+  const checkLogin = () => {
     const token = sessionStorage.getItem("token");
     const storedUser = sessionStorage.getItem("user");
     if (token && storedUser) {
@@ -61,6 +62,20 @@ export default function Navigation() {
       setIsLoggedIn(false);
       setUser(null);
     }
+  };
+
+  // Check on mount
+  useEffect(() => {
+    checkLogin();
+
+    // Listen to storage changes (other tabs or logout events)
+    const handleStorageChange = () => {
+      checkLogin();
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
 

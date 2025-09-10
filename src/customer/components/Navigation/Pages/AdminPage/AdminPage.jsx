@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 export default function AdminPage() {
 
     const [user, setUser] = useState(null);
+    const [message, setMessage] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -21,6 +22,12 @@ export default function AdminPage() {
     const handleLogout = () => {
         sessionStorage.removeItem("token");
         sessionStorage.removeItem("user");
+
+        setMessage("Successfully logged out!");
+
+        setTimeout(() => {
+            navigate("/login");
+        }, 1500);
     };
 
     if (!user) return null;
@@ -44,6 +51,11 @@ export default function AdminPage() {
                     Support Submissions
                 </button>
             </div>
+
+            {/* Render logout message here */}
+            {message && (
+                <p className="mt-4 text-green-500 font-medium">{message}</p>
+            )}
 
             <button
                 onClick={handleLogout}
