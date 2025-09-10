@@ -14,7 +14,7 @@ const port = process.env.PORT || 5050;
 app.use(cors());
 app.use(express.json());
 app.use('/api/auth', authRoutes);
-app.use('/api/user', userRoutes);
+app.use('/api/users', userRoutes);
 
 
 // --- MySQL setup ---
