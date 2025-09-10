@@ -1,4 +1,4 @@
-// src/context/AuthContext.js
+
 import React, { createContext, useReducer, useEffect } from "react";
 
 const AuthContext = createContext();
@@ -30,7 +30,6 @@ function authReducer(state, action) {
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  // On mount, check if token exists in localStorage
   useEffect(() => {
     const token = localStorage.getItem("token");
     const user = localStorage.getItem("user");
