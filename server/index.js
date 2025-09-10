@@ -7,6 +7,7 @@ require('dotenv').config();
 
 const authRoutes = require('./routes/auth.js');
 const userRoutes = require('./routes/user.js'); 
+const ordersRouter = require('./routes/orders.js');
 
 const app = express();
 const port = process.env.PORT || 5050;
@@ -15,6 +16,7 @@ app.use(cors());
 app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use("/orders", ordersRouter);
 
 
 // --- MySQL setup ---
