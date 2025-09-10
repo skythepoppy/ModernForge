@@ -33,7 +33,7 @@ const RegisterPage = () => {
             console.log("Registered user:", newUser);
 
             handleRedirect(newUser);
-            
+
         } catch (err) {
             console.error("Registration error:", err); // error checking 
             setMessage(
@@ -58,7 +58,7 @@ const RegisterPage = () => {
     };
 
     return (
-        <div className="flex items-center justify-center h-screen bg-gray-100">
+        <div className="flex justify-center items-start pt-8 pb-6">
             <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-lg w-96">
                 <h2 className="text-2xl font-bold mb-6">Register</h2>
 
@@ -89,7 +89,7 @@ const RegisterPage = () => {
 
                 <button
                     type="submit"
-                    className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+                    className="w-full bg-orange-500 text-white p-2 rounded hover:bg-orange-600"
                 >
                     Register
                 </button>

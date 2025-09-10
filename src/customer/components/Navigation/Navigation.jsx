@@ -12,6 +12,7 @@ import {
   ShoppingCartIcon,
   XMarkIcon,
   UserIcon,
+  UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 import { Gi3dHammer } from "react-icons/gi";
@@ -159,10 +160,15 @@ export default function Navigation() {
                 }
               >
                 <MenuButton className="relative flex flex-col items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500">
-                  <UserIcon
-                    className={user ? "text-orange-500 w-8 h-8" : "text-gray-300 w-8 h-8"}
-                    aria-hidden="true"
-                  />
+                  {user ? (
+                    user.role === "admin" ? (
+                      <UserGroupIcon className="text-orange-500 w-8 h-8" aria-hidden="true" />
+                    ) : (
+                      <UserIcon className="text-orange-500 w-8 h-8" aria-hidden="true" />
+                    )
+                  ) : (
+                    <UserIcon className="text-gray-300 w-8 h-8" aria-hidden="true" />
+                  )}
                 </MenuButton>
               </Link>
             </Menu>

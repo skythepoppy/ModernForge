@@ -102,12 +102,12 @@ export default function AdminPage() {
                     <div className="border rounded-lg shadow-md">
                         <button
                             className="w-full text-left font-semibold px-4 py-3 flex justify-between items-center"
-                            onClick={() => toggleSection(1)}
+                            onClick={() => toggleSection(2)}
                         >
                             <span>View Support Inquiries</span>
-                            <span>{openIndex === 1 ? "−" : "+"}</span>
+                            <span>{openIndex === 2 ? "−" : "+"}</span>
                         </button>
-                        {openIndex === 1 && (
+                        {openIndex === 2 && (
                             <div className="px-4 pb-4 text-gray-700">
                                 <p>123 Main St, Hurst, TX 76053</p>
                                 <p>456 Oak Ave, Dallas, TX 75201</p>
@@ -119,12 +119,12 @@ export default function AdminPage() {
                     <div className="border rounded-lg shadow-md">
                         <button
                             className="w-full text-left font-semibold px-4 py-3 flex justify-between items-center"
-                            onClick={() => toggleSection(1)}
+                            onClick={() => toggleSection(3)}
                         >
                             <span>View Wholesale Entries</span>
-                            <span>{openIndex === 1 ? "−" : "+"}</span>
+                            <span>{openIndex === 3 ? "−" : "+"}</span>
                         </button>
-                        {openIndex === 1 && (
+                        {openIndex === 3 && (
                             <div className="px-4 pb-4 text-gray-700">
                                 <p>123 Main St, Hurst, TX 76053</p>
                                 <p>456 Oak Ave, Dallas, TX 75201</p>
@@ -136,12 +136,12 @@ export default function AdminPage() {
                     <div className="border rounded-lg shadow-md">
                         <button
                             className="w-full text-left font-semibold px-4 py-3 flex justify-between items-center"
-                            onClick={() => toggleSection(1)}
+                            onClick={() => toggleSection(4)}
                         >
                             <span>User Management</span>
-                            <span>{openIndex === 1 ? "−" : "+"}</span>
+                            <span>{openIndex === 4 ? "−" : "+"}</span>
                         </button>
-                        {openIndex === 1 && (
+                        {openIndex === 4 && (
                             <div className="px-4 pb-4 text-gray-700">
                                 <p>123 Main St, Hurst, TX 76053</p>
                                 <p>456 Oak Ave, Dallas, TX 75201</p>
