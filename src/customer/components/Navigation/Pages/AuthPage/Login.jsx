@@ -19,7 +19,7 @@ const LoginPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post("http://localhost:5000/api/auth/login", formData);
+            const res = await axios.post("http://localhost:5050/api/auth/login", formData);
 
             // Store JWT (sessionStorage for now)
             sessionStorage.setItem("token", res.data.token);

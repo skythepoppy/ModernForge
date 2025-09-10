@@ -156,7 +156,7 @@ export default function Navigation() {
               {isLoggedIn ? (
                 <Link to="/profile">
                   <MenuButton className="relative flex flex-col items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500">
-                    <UserIcon className="text-orange-500 w-8 h-8" aria-hidden="true" />
+                    <UserIcon className={isLoggedIn ? "text-orange-500 w-8 h-8" : "text-gray-300 w-8 h-8"} aria-hidden="true" />
                   </MenuButton>
                 </Link>
               ) : (
