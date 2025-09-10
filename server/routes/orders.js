@@ -1,17 +1,17 @@
 const express = require("express");
 const router = express.Router();
-const pool = require("..");
+const db = require("../db");
 
 
 //middleware user verification
-const { verifyToken } = require("../middleware/auth");
+const { authMiddleware, adminMiddleware } = require("../middleware/auth");
 
 // Create a new order
-router.post("/", verifyToken, async (req, res) => {
+router.post("/", authMiddleware, async (req, res) => {
     const { userId, items } = req.body; // items: [{ productId, quantity, price }]
     try {
         for (const item of items) {
-            await pool.query(
+            await db.query(
                 "INSERT INTO orders (userId, productId, quantity, price) VALUES (?, ?, ?, ?)",
                 [userId, item.productId, item.quantity, item.price]
             );
@@ -24,10 +24,10 @@ router.post("/", verifyToken, async (req, res) => {
 });
 
 // Get all orders for a user
-router.get("/", verifyToken, async (req, res) => {
+router.get("/", authMiddleware, adminMiddleware, async (req, res) => {
     const userId = req.user.id; // assuming verifyToken attaches user to req
     try {
-        const [rows] = await pool.query(
+        const [rows] = await db.query(
             "SELECT * FROM orders WHERE userId = ? ORDER BY createdAt DESC",
             [userId]
         );

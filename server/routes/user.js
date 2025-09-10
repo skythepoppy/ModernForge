@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { authMiddleware, adminMiddleware } = require("../middleware/auth.js"); // middleware
-const db = require("../db.js"); // knex
+const db = require("../db"); // knex
 
 // Get logged-in user's profile
 router.get("/profile", authMiddleware, async (req, res) => {
