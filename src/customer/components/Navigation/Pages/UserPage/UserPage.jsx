@@ -14,6 +14,9 @@ export default function UserPage() {
 
         if (!token || !storedUser) {
             navigate("/login");
+        } else if (storedUser.role === "admin") {
+            // Redirect admins to the correct dashboard
+            navigate("/admin/dashboard");
         } else {
             setUser(storedUser);
         }
