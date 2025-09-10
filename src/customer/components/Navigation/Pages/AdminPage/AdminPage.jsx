@@ -1,39 +1,31 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import AuthContext from "../context/AuthContext";
 
 export default function AdminPage() {
-
-    const [user, setUser] = useState(null);
+    const { user, token, logout } = useContext(AuthContext);
     const [message, setMessage] = useState("");
     const navigate = useNavigate();
 
-    useEffect(() => {
+    // Redirect if not authenticated or not admin
+    if (!user || !token) {
+        navigate("/login", { replace: true });
+        return null;
+    }
 
-        const storedUser = JSON.parse(sessionStorage.getItem("user"));
-        const token = sessionStorage.getItem("token");
-
-        if (!token || !storedUser || storedUser.role !== "admin") {
-            navigate("/login");
-        } else if (storedUser.role === "user") {
-            // Redirect users to the correct dashboard
-            navigate("/user/dashboard");
-        } else {
-            setUser(storedUser);
-        }
-    }, [navigate]);
+    if (user.role !== "admin") {
+        navigate("/login", { replace: true });
+        return null;
+    }
 
     const handleLogout = () => {
-        sessionStorage.removeItem("token");
-        sessionStorage.removeItem("user");
-
+        logout();
         setMessage("Successfully logged out!");
 
         setTimeout(() => {
-            navigate("/login");
+            navigate("/login", { replace: true });
         }, 1500);
     };
-
-    if (!user) return null;
 
     return (
         <div className="p-8">
@@ -55,7 +47,7 @@ export default function AdminPage() {
                 </button>
             </div>
 
-            {/* Render logout message here */}
+            {/* Render logout message */}
             {message && (
                 <p className="mt-4 text-green-500 font-medium">{message}</p>
             )}
@@ -69,5 +61,3 @@ export default function AdminPage() {
         </div>
     );
 }
-
-
