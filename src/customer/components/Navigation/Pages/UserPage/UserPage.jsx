@@ -13,7 +13,7 @@ export default function UserPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await api.get("/user/data"); // centralized Axios handles token
+                const res = await api.get("/users/profile"); // centralized Axios handles token
                 setUserData(res.data);
             } catch (err) {
                 console.error("Error fetching user data:", err);

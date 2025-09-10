@@ -13,7 +13,7 @@ export default function AdminPage() {
   useEffect(() => {
     const fetchAdminData = async () => {
       try {
-        const res = await api.get("/admin/data"); // centralized Axios handles token
+        const res = await api.get("/users/all"); // centralized Axios handles token
         setAdminData(res.data);
       } catch (err) {
         console.error("Error fetching admin data:", err);
