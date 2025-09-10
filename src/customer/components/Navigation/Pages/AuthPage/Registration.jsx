@@ -1,7 +1,8 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
+import usePreviousRoute from "../hooks/usePreviousRoute"; // adjust path as needed
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
@@ -11,8 +12,17 @@ const RegisterPage = () => {
     });
     const [message, setMessage] = useState("");
 
-    const { login } = useContext(AuthContext);
+    const { user, token, login } = useContext(AuthContext);
     const navigate = useNavigate();
+    const prevLocation = usePreviousRoute();
+
+    // --- Redirect if already logged in ---
+    useEffect(() => {
+        if (user && token) {
+            handleRedirect(user);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user, token]);
 
     const handleChange = (e) => {
         setFormData({
@@ -24,7 +34,10 @@ const RegisterPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post("http://localhost:5050/api/auth/register", formData);
+            const res = await axios.post(
+                "http://localhost:5050/api/auth/register",
+                formData
+            );
 
             // auto-login using AuthContext
             login(res.data.user, res.data.token);
@@ -32,14 +45,25 @@ const RegisterPage = () => {
             setMessage("Registration successful!");
             console.log("Registered user:", res.data);
 
-            // Redirect based on role
-            if (res.data.user.role === "admin") {
-                navigate("/admin/dashboard", { replace: true });
-            } else {
-                navigate("/user/dashboard", { replace: true });
-            }
+            // Redirect after registration
+            handleRedirect(res.data.user);
         } catch (err) {
             setMessage(err.response?.data?.message || "Error occurred");
+        }
+    };
+
+    // 🔑 Helper: decide redirect location
+    const handleRedirect = (user) => {
+        if (
+            prevLocation &&
+            prevLocation.pathname !== "/login" &&
+            prevLocation.pathname !== "/register"
+        ) {
+            navigate(prevLocation.pathname, { replace: true });
+        } else if (user.role === "admin") {
+            navigate("/admin/dashboard", { replace: true });
+        } else {
+            navigate("/user/dashboard", { replace: true });
         }
     };
 

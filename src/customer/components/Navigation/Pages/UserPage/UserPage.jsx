@@ -1,40 +1,31 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import AuthContext from "../context/AuthContext";
 
 export default function UserPage() {
-
-    const [user, setUser] = useState(null);
+    const { user, token, logout } = useContext(AuthContext);
     const [message, setMessage] = useState("");
     const navigate = useNavigate();
 
-    useEffect(() => {
+    // Redirect if not authenticated or wrong role
+    if (!user || !token) {
+        navigate("/login", { replace: true });
+        return null;
+    }
 
-        const storedUser = JSON.parse(sessionStorage.getItem("user"));
-        const token = sessionStorage.getItem("token");
-
-        if (!token || !storedUser) {
-            navigate("/login");
-        } else if (storedUser.role === "admin") {
-            // Redirect admins to the correct dashboard
-            navigate("/admin/dashboard");
-        } else {
-            setUser(storedUser);
-        }
-    }, [navigate]);
+    if (user.role !== "user") {
+        navigate("/login", { replace: true });
+        return null;
+    }
 
     const handleLogout = () => {
-        sessionStorage.removeItem("token");
-        sessionStorage.removeItem("user");
-
+        logout(); // centralized logout
         setMessage("Successfully logged out!");
 
         setTimeout(() => {
-            navigate("/login");
+            navigate("/login", { replace: true });
         }, 1500);
-
     };
-
-    if (!user) return null;
 
     return (
         <div className="p-8">
@@ -56,5 +47,3 @@ export default function UserPage() {
         </div>
     );
 }
-
-
