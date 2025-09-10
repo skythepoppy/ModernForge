@@ -24,15 +24,26 @@ const RegisterPage = () => {
         e.preventDefault();
         try {
             const res = await api.post("/auth/register", formData); // centralized API call
+            const { user: newUser, token } = res.data;
 
-            login(res.data.user, res.data.token); // auto-login
+            console.log("Full response:", res);
+
+            login(newUser, token); // auto-login
             setMessage("Registration successful!");
-            console.log("Registered user:", res.data);
+            console.log("Registered user:", newUser);
 
-            handleRedirect(res.data.user);
+            handleRedirect(newUser);
+            
         } catch (err) {
-            setMessage(err.response?.data?.message || "Error occurred");
+            console.error("Registration error:", err); // error checking 
+            setMessage(
+                err.response?.data?.message ||
+                err.response?.data ||
+                err.message ||
+                "Error occurred"
+            );
         }
+
     };
 
     const handleRedirect = (user) => {

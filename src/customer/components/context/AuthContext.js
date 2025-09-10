@@ -30,23 +30,30 @@ function authReducer(state, action) {
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  // On app load, check localStorage for user/token
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const user = localStorage.getItem("user");
+  const token = localStorage.getItem("token");
+  const userStr = localStorage.getItem("user");
 
-    if (token && user) {
-      // Sync token with Axios instance
+  if (token && userStr) {
+    try {
+      const user = JSON.parse(userStr); // safely parse
       setToken(token);
 
       dispatch({
         type: "LOGIN",
-        payload: { token, user: JSON.parse(user) },
+        payload: { token, user },
       });
-    } else {
+    } catch (err) {
+      console.error("Failed to parse user from localStorage:", err);
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
       dispatch({ type: "SET_LOADING", payload: false });
     }
-  }, []);
+  } else {
+    dispatch({ type: "SET_LOADING", payload: false });
+  }
+}, []);
+
 
   const login = (user, token) => {
     localStorage.setItem("token", token);
