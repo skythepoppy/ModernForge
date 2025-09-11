@@ -1,16 +1,28 @@
 import React from "react";
 import { useCart } from "../../../context/CartContext";
 import { useAuth } from "../../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function CartPage() {
-    const { cart, removeFromCart, updateQuantity, checkout } = useCart();
+    const { cart, removeFromCart, updateQuantity, checkout, loading, error } = useCart();
     const { user } = useAuth();
+    const navigate = useNavigate();
 
     // Calculate total price
-    const totalPrice = cart.reduce(
-        (total, item) => total + item.price * item.quantity,
-        0
-    );
+    const totalPrice = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+
+    const handleCheckout = async () => {
+        if (!user) {
+            alert("You must be logged in to place an order");
+            return;
+        }
+
+        const result = await checkout();
+        if (result.success) {
+            // Navigate to Order Confirmation Page with order data
+            navigate("/orders/confirmation", { state: { order: result.order } });
+        }
+    };
 
     if (cart.length === 0) {
         return <p className="text-center mt-12 text-lg">Your cart is empty!</p>;
@@ -19,6 +31,8 @@ export default function CartPage() {
     return (
         <div className="max-w-4xl mx-auto mt-12 p-6">
             <h2 className="text-3xl font-bold mb-6">Your Cart</h2>
+
+            {error && <p className="text-red-500 mb-4">{error}</p>}
 
             <div className="space-y-4">
                 {cart.map((item) => (
@@ -68,10 +82,11 @@ export default function CartPage() {
             <div className="mt-6 flex justify-between items-center border-t pt-4">
                 <p className="text-xl font-bold">Total: ${totalPrice.toFixed(2)}</p>
                 <button
-                    onClick={checkout}
+                    onClick={handleCheckout}
                     className="px-6 py-3 bg-orange-500 text-white font-bold rounded hover:bg-orange-600"
+                    disabled={loading}
                 >
-                    Checkout
+                    {loading ? "Placing Order..." : "Checkout"}
                 </button>
             </div>
         </div>
