@@ -1,6 +1,8 @@
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "@mui/material";
+import { useCart } from "../components/context/CartContext";
+import { useAuth } from "../components/context/AuthContext";
 
 export default function ProductPage() {
     const navigate = useNavigate();
@@ -9,6 +11,9 @@ export default function ProductPage() {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const { addToCart } = useCart(); // use CartContext
+    const { user } = useAuth(); // use AuthContext
 
     // DB column mapping
     const categoryMap = {
@@ -22,12 +27,15 @@ export default function ProductPage() {
         new_release: "New Release",
     };
 
+    // Fetch single product
     useEffect(() => {
         async function fetchProduct() {
             try {
                 const response = await fetch("http://localhost:5050/api/toys");
                 const data = await response.json();
-                const selectedProduct = data.find((item) => item.id.toString() === productId);
+                const selectedProduct = data.find(
+                    (item) => item.id.toString() === productId
+                );
                 setProduct(selectedProduct);
             } catch (err) {
                 console.error("Error fetching product:", err);
@@ -47,40 +55,39 @@ export default function ProductPage() {
     const { price, discountedPrice } = product;
 
     const handleAddToCart = async () => {
-        try {
-            const res = await fetch(`/api/cart`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ productId: product.id, quantity: 1 }),
-            });
-            if (!res.ok) throw new Error("Failed to add to cart");
-            alert(`${product.item} added to cart`);
-        } catch (err) {
-            console.error(err);
-            alert("Error adding to cart");
+        if (!user) {
+            navigate("/login");
+            return;
         }
+
+        await addToCart({
+            productId: product.id,
+            name: product.item,
+            price: discountedPrice || price,
+            brand: product.brand,
+        });
+
+        alert(`${product.item} added to cart`);
     };
 
     const handleBuyNow = async () => {
-        try {
-            const res = await fetch(`/api/orders`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ items: [{ productId: product.id, quantity: 1 }] }),
-            });
-            if (!res.ok) throw new Error("Failed to create order");
-            const order = await res.json();
-            alert(`Order #${order.id} placed successfully!`);
-        } catch (err) {
-            console.error(err);
-            alert("Error placing order");
+        if (!user) {
+            navigate("/login");
+            return;
         }
+
+        await addToCart({
+            productId: product.id,
+            name: product.item,
+            price: discountedPrice || price,
+            brand: product.brand,
+        });
+
+        navigate("/checkout"); 
     };
 
     // Dynamic breadcrumb using location.state
     const { previousPageLabel, previousPagePath } = location.state || {};
-
-
 
     return (
         <div className="max-w-6xl mx-auto p-6">
@@ -111,8 +118,6 @@ export default function ProductPage() {
                 <span className="font-bold">{product.item}</span>
             </div>
 
-
-
             {/* Grid for product image + info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 {/* Product Image */}
@@ -129,8 +134,12 @@ export default function ProductPage() {
                     <h1 className="text-3xl font-bold">{product.item}</h1>
                     {discountedPrice ? (
                         <p className="text-xl font-semibold text-gray-900 mt-2">
-                            <span className="line-through mr-2">${price.toFixed(2)}</span>
-                            <span className="text-orange-500">${discountedPrice.toFixed(2)}</span>
+                            <span className="line-through mr-2">
+                                ${price.toFixed(2)}
+                            </span>
+                            <span className="text-orange-500">
+                                ${discountedPrice.toFixed(2)}
+                            </span>
                         </p>
                     ) : (
                         <p className="text-xl font-semibold text-gray-900 mt-2">
@@ -152,7 +161,11 @@ export default function ProductPage() {
                         <Button
                             variant="contained"
                             onClick={handleAddToCart}
-                            sx={{ bgcolor: "#F97316", color: "white", "&:hover": { bgcolor: "#EA580C" } }}
+                            sx={{
+                                bgcolor: "#F97316",
+                                color: "white",
+                                "&:hover": { bgcolor: "#EA580C" },
+                            }}
                         >
                             Add to Cart
                         </Button>
@@ -174,5 +187,4 @@ export default function ProductPage() {
             </div>
         </div>
     );
-
 }

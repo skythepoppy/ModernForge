@@ -1,61 +1,114 @@
-import React, { createContext, useContext, useState } from "react";
-import AuthContext from "./AuthContext";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
+import AuthContext from "./AuthContext";
+import api from "../api/api";
 
 // initialize the context
 const CartContext = createContext();
 
-//custom hook 
+// custom hook
 export const useCart = () => useContext(CartContext);
 
-// cart provider component
+// provider
 export const CartProvider = ({ children }) => {
     const [cart, setCart] = useState([]);
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
 
+    // --- fetch cart from backend whenever user logs in ---
+    useEffect(() => {
+        if (user) {
+            fetchCart();
+        } else {
+            setCart([]); // reset when logged out
+        }
+    }, [user]);
 
-    // -- add item to cart -- 
-    const addToCart = (product) => {
+    const fetchCart = async () => {
+        try {
+            const res = await api.get("/cart");
+            setCart(res.data);
+        } catch (err) {
+            console.error("Failed to fetch cart:", err);
+        }
+    };
+
+    // --- add item to cart ---
+    const addToCart = async (product) => {
         if (!user) {
-            //verify only registered users can add to cart
             navigate("/login");
             return;
         }
 
-        setCart((prevCart) => {
-            const existingItem = prevCart.find((item) => item.productId === product.productId);
-            if (existingItem) {
-                return prevCart.map((item) =>
-                    item.productId === product.productId ? { ...item, quantity: item.quantity + 1 } : item);
-            } else {
-                return [...prevCart, { ...product, quantity: 1 }];
-            }
-        });
+        try {
+            const res = await api.post("/cart", {
+                productId: product.productId,
+                quantity: 1,
+            });
+            setCart(res.data); // backend returns updated cart
+        } catch (err) {
+            console.error("Failed to add to cart:", err);
+        }
     };
 
-    // -- remove item from cart --
-    const removeFromCart = (productId) => {
-        setCart((prevCart) => prevCart.filter((item) => item.productId !== productId));
+    // --- remove item from cart ---
+    const removeFromCart = async (productId) => {
+        try {
+            const res = await api.delete(`/cart/${productId}`);
+            setCart(res.data);
+        } catch (err) {
+            console.error("Failed to remove from cart:", err);
+        }
     };
 
-    // -- update quantity of an item --
-    const updateQuantity = (productId, quantity) => {
+    // --- update item quantity ---
+    const updateQuantity = async (productId, quantity) => {
         if (quantity <= 0) {
-            removeFromCart(productId);
+            return removeFromCart(productId);
+        }
+
+        try {
+            const res = await api.put(`/cart/${productId}`, { quantity });
+            setCart(res.data);
+        } catch (err) {
+            console.error("Failed to update quantity:", err);
+        }
+    };
+
+    // --- clear entire cart ---
+    const clearCart = async () => {
+        try {
+            await api.delete("/cart");
+            setCart([]);
+        } catch (err) {
+            console.error("Failed to clear cart:", err);
+        }
+    };
+
+    // -- checkout --
+    const checkout = async () => {
+        if (!user) {
+            alert("You must be logged in to place an order");
             return;
         }
 
-        setCart((prevCart) =>
-            prevCart.map((item) =>
-                item.productId === productId ? { ...item, quantity } : item
-            )
-        );
-    };
+        try {
+            const order = {
+                userId: user.id,
+                items: cart.map((item) => ({
+                    productId: item.productId,
+                    quantity: item.quantity,
+                })),
+            };
 
-    // Clear the entire cart
-    const clearCart = () => setCart([]);
+            await api.post("/orders", order);
+            await clearCart();
+            alert("Order placed successfully!");
+        } catch (err) {
+            console.error("Checkout failed:", err);
+            alert("Something went wrong. Please try again.");
+        }
+    };
 
     return (
         <CartContext.Provider
@@ -65,11 +118,11 @@ export const CartProvider = ({ children }) => {
                 removeFromCart,
                 updateQuantity,
                 clearCart,
+                fetchCart,
+                checkout, 
             }}
         >
             {children}
         </CartContext.Provider>
     );
 };
-
-
