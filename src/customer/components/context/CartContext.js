@@ -14,7 +14,6 @@ export const CartProvider = ({ children }) => {
     const [cart, setCart] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
-
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
 
@@ -118,18 +117,19 @@ export const CartProvider = ({ children }) => {
         setLoading(true);
 
         try {
-            const order = {
+            const orderPayload = {
                 userId: user.id,
                 items: cart.map((item) => ({
                     productId: item.productId,
                     quantity: item.quantity,
+                    price: item.price
                 })),
             };
 
-            await api.post("/orders", order);
+            const res = await api.post("/orders", orderPayload);
             await clearCart();
-            alert("Order placed successfully!");
-            return { success: true };
+ 
+            return { success: true , order: res.data};
         } catch (err) {
             console.error("Checkout failed:", err);
             setError("Failed to place order. Please try again.");
