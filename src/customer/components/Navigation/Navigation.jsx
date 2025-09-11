@@ -20,6 +20,7 @@ import { FaSearch } from "react-icons/fa";
 import AlertCarousel from "./AlertCarousel";
 import { useContext } from "react";
 import AuthContext from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 
 
 const navigation = [
@@ -51,6 +52,7 @@ function classNames(...classes) {
 export default function Navigation() {
 
   const { user } = useContext(AuthContext);
+  const { cart } = useCart();
 
   const alerts = [
     "Free shipping for orders over $100!",
@@ -174,20 +176,25 @@ export default function Navigation() {
             </Menu>
 
 
-
-            <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-              <button
-                type="button"
-                className="relative rounded-full p-1 text-gray-400 focus:outline-2 focus:outline-offset-2 focus:outline-indigo-500"
+            {/* Cart */}
+            <Menu as="div" className="relative ml-3">
+              <Link
+                to={user ? "/cart" : "/login"} // Navigate to cart if logged in, otherwise to login
               >
-                <span className="absolute -inset-1.5" />
-                <span className="sr-only">View Cart</span>
-                <ShoppingCartIcon
-                  aria-hidden="true"
-                  className="text-gray-300 w-8 h-8"
-                />
-              </button>
-            </div>
+                <MenuButton className="relative flex flex-col items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500">
+                  <ShoppingCartIcon
+                    aria-hidden="true"
+                    className={`w-8 h-8 ${cart.length > 0 ? "text-orange-500" : "text-gray-300"}`}
+                  />
+                  {cart.length > 0 && (
+                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                      {cart.length}
+                    </span>
+                  )}
+                </MenuButton>
+              </Link>
+            </Menu>
+
           </div>
         </div>
 

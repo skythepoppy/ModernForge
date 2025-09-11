@@ -1,5 +1,5 @@
 import './App.css';
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom"; // no BrowserRouter here
 import Layout from './customer/components/Layout/Layout';
 import HomePage from './customer/components/Navigation/Pages/HomePage/HomePage';
 import FAQPage from './customer/components/Navigation/Pages/FAQPage/FAQPage';
@@ -18,50 +18,57 @@ import LoginPage from './customer/components/Navigation/Pages/AuthPage/Login';
 import RegisterPage from './customer/components/Navigation/Pages/AuthPage/Registration';
 import AdminPage from './customer/components/Navigation/Pages/AdminPage/AdminPage';
 import UserPage from './customer/components/Navigation/Pages/UserPage/UserPage';
-import ProtectedRoute from './customer/components/ProtectedRoute'; // import ProtectedRoute
+import CartPage from './customer/components/Navigation/Pages/CartPage/CartPage';
+import ProtectedRoute from './customer/components/ProtectedRoute';
 
 function App() {
   return (
-    <Router>
-      <Layout>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/faq" element={<FAQPage />} />
-          <Route path="/support" element={<SupportPage />} />
-          <Route path="/shippingreturns" element={<ShippingReturnsPage />} />
-          <Route path="/wholesale" element={<WholesalePage />} />
-          <Route path='/affiliate' element={<AffiliatePage />} />
-          <Route path='/weeklydeals' element={<WeeklyDealsPage />} />
-          <Route path='/aircrafts' element={<AircraftPage />} />
-          <Route path='/automobiles' element={<AutomobilePage />} />
-          <Route path='/watercrafts' element={<WatercraftPage />} />
-          <Route path='/programmables' element={<ProgrammablePage />} />
-          <Route path='/products/:productId' element={<ProductPage />} />
-          <Route path='/newsletter' element={<NewsletterPage />} />
-          <Route path='/register' element={<RegisterPage />} />
-          <Route path='/login' element={<LoginPage />} />
+    <Layout>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<HomePage />} />
+        <Route path="/faq" element={<FAQPage />} />
+        <Route path="/support" element={<SupportPage />} />
+        <Route path="/shippingreturns" element={<ShippingReturnsPage />} />
+        <Route path="/wholesale" element={<WholesalePage />} />
+        <Route path='/affiliate' element={<AffiliatePage />} />
+        <Route path='/weeklydeals' element={<WeeklyDealsPage />} />
+        <Route path='/aircrafts' element={<AircraftPage />} />
+        <Route path='/automobiles' element={<AutomobilePage />} />
+        <Route path='/watercrafts' element={<WatercraftPage />} />
+        <Route path='/programmables' element={<ProgrammablePage />} />
+        <Route path='/products/:productId' element={<ProductPage />} />
+        <Route path='/newsletter' element={<NewsletterPage />} />
+        <Route path='/register' element={<RegisterPage />} />
+        <Route path='/login' element={<LoginPage />} />
 
-          {/* Protected Routes */}
-          <Route 
-            path='/user/dashboard' 
-            element={
-              <ProtectedRoute role="user">
-                <UserPage />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path='/admin/dashboard' 
-            element={
-              <ProtectedRoute role="admin">
-                <AdminPage />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </Layout>
-    </Router>
+        {/* Protected Routes */}
+        <Route
+          path='/user/dashboard'
+          element={
+            <ProtectedRoute role="user">
+              <UserPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/admin/dashboard'
+          element={
+            <ProtectedRoute role="admin">
+              <AdminPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <CartPage />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </Layout>
   );
 }
 

@@ -1,11 +1,12 @@
 import React, { useContext } from "react";
-import { CartContext } from "../context/CartContext";
-import { AuthContext } from "../context/AuthContext";
-import api from "../../api/api";
+import { useCart } from "../../../context/CartContext";
+import AuthContext from "../../../context/AuthContext";
+import api from "../../../api/api";
+
 
 export default function CartPage() {
-  const { cartItems, removeFromCart, clearCart, updateQuantity } =
-    useContext(CartContext);
+  const { cart, removeFromCart, clearCart, updateQuantity } =
+    useCart();
   const { user } = useContext(AuthContext);
 
   const handleCheckout = async () => {
@@ -14,7 +15,7 @@ export default function CartPage() {
     try {
       await api.post("/orders", {
         userId: user.id,
-        items: cartItems,
+        items: cart,
       });
       clearCart();
       alert("Order placed successfully!");
@@ -25,12 +26,12 @@ export default function CartPage() {
   };
 
   // Calculate total price
-  const totalPrice = cartItems.reduce(
+  const totalPrice = cart.reduce(
     (total, item) => total + item.price * item.quantity,
     0
   );
 
-  if (cartItems.length === 0) {
+  if (cart.length === 0) {
     return <p className="text-center mt-12 text-lg">Your cart is empty!</p>;
   }
 
@@ -38,7 +39,7 @@ export default function CartPage() {
     <div className="max-w-4xl mx-auto mt-12 p-6">
       <h2 className="text-3xl font-bold mb-6">Your Cart</h2>
       <div className="space-y-4">
-        {cartItems.map((item, index) => (
+        {cart.map((item, index) => (
           <div
             key={index}
             className="flex justify-between items-center border rounded-lg p-4 shadow-sm"
