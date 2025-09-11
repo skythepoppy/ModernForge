@@ -24,19 +24,28 @@ export const OrderProvider = ({ children }) => {
     const fetchOrders = async () => {
         if (!user) return;
         setLoading(true);
+        setError(null);
         try {
             const res = await api.get("/orders");
             setOrders(res.data);
         } catch (err) {
             console.error("Failed to fetch orders:", err);
-            setError(err.message);
+            setError("Failed to fetch orders. Please try again.");
         } finally {
             setLoading(false);
         }
     };
 
     const placeOrder = async (cartItems) => {
-        if (!user) throw new Error("User must be logged in to place an order");
+        if (!user) {
+            const message = "User must be logged in to place an order";
+            setError(message);
+            throw new Error(message);
+        }
+
+        setError(null);
+        setLoading(true);
+
         try {
             const res = await api.post("/orders", {
                 userId: user.id,
@@ -45,16 +54,22 @@ export const OrderProvider = ({ children }) => {
                     quantity: item.quantity,
                 })),
             });
+
             setOrders((prev) => [...prev, res.data]); // append new order
-            return res.data;
+            return { success: true, order: res.data };
         } catch (err) {
             console.error("Failed to place order:", err);
-            throw err;
+            setError("Failed to place order. Please try again.");
+            return { success: false, error: err };
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <OrderContext.Provider value={{ orders, loading, error, fetchOrders, placeOrder }}>
+        <OrderContext.Provider
+            value={{ orders, loading, error, fetchOrders, placeOrder }}
+        >
             {children}
         </OrderContext.Provider>
     );
