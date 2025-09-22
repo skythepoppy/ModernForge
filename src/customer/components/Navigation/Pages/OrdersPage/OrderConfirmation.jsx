@@ -10,6 +10,8 @@ export default function OrderConfirmation() {
         return <p className="text-center mt-12 text-lg">No order found.</p>;
     }
 
+    const total = order.items.reduce((sum, i) => sum + i.price * i.quantity, 0).toFixed(2);
+
     return (
         <div className="max-w-4xl mx-auto mt-12 p-6 text-center">
             <h2 className="text-3xl font-bold mb-6 text-green-600">Your order has been placed!</h2>
@@ -26,7 +28,7 @@ export default function OrderConfirmation() {
                 ))}
             </div>
 
-            <p className="text-xl font-bold">Total: ${order.items.reduce((sum, i) => sum + i.price * i.quantity, 0).toFixed(2)}</p>
+            <p className="text-xl font-bold">Total: ${total}</p>
 
             <button
                 onClick={() => navigate("/")}

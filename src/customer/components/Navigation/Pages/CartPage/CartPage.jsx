@@ -40,7 +40,7 @@ export default function CartPage() {
                         key={item.productId}
                         className="flex justify-between items-center border rounded-lg p-4 shadow-sm"
                     >
-                        {/* Product Info */}
+                        {/* product Info */}
                         <div>
                             <p className="font-semibold">{item.name}</p>
                             <p className="text-gray-600">{item.brand}</p>

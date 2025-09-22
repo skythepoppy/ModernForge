@@ -14,22 +14,25 @@ export default function OrdersPage() {
         return <p className="text-center mt-12 text-lg">Your cart is empty!</p>;
     }
 
-    const totalPrice = cart.reduce(
-        (total, item) => total + item.price * item.quantity,
-        0
-    );
+    const totalPrice = cart.reduce((total, item) => total + item.price * item.quantity, 0);
 
     const handlePlaceOrder = async () => {
         setLoading(true);
         setError(null);
+
         try {
-            // Call CartContext checkout to clear cart and create order
-            await checkout();
+            // Call checkout in CartContext to create order & clear cart
+            const result = await checkout();
+            if (!result.success) {
+                setError(result.error || "Failed to place order.");
+                return;
+            }
 
-            // Optional: save order in OrderContext for order history
-            await placeOrder(cart);
+            // update OrderContext locally 
+            const newOrder = await placeOrder(cart);
 
-            navigate("/orders/history"); // redirect to order history or confirmation
+            // Navigate to Order Confirmation Page
+            navigate("/orders/confirmation", { state: { order: newOrder } });
         } catch (err) {
             console.error(err);
             setError("Failed to place order. Please try again.");
@@ -41,6 +44,8 @@ export default function OrdersPage() {
     return (
         <div className="max-w-4xl mx-auto mt-12 p-6">
             <h2 className="text-3xl font-bold mb-6">Checkout</h2>
+
+            {error && <p className="text-red-500 mb-4">{error}</p>}
 
             <div className="space-y-4">
                 {cart.map((item) => (
@@ -69,8 +74,6 @@ export default function OrdersPage() {
                     {loading ? "Placing Order..." : "Place Order"}
                 </button>
             </div>
-
-            {error && <p className="text-red-500 mt-4">{error}</p>}
         </div>
     );
 }

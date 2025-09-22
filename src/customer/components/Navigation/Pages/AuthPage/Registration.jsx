@@ -11,7 +11,7 @@ const RegisterPage = () => {
     const navigate = useNavigate();
     const location = useLocation(); // track previous route
 
-    // If already logged in, redirect
+    // redirection
     useEffect(() => {
         if (user && token) handleRedirect(user);
     }, [user, token]);
@@ -35,7 +35,7 @@ const RegisterPage = () => {
             handleRedirect(newUser);
 
         } catch (err) {
-            console.error("Registration error:", err); // error checking 
+            console.error("Registration error:", err);  
             setMessage(
                 err.response?.data?.message ||
                 err.response?.data ||
